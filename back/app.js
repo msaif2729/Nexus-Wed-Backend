@@ -7,10 +7,15 @@ const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
 const { Buffer } = require('buffer');
 const os = require('os');
+require('dotenv').config({ path: '.env.local' });
+
 
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
+
+const ip = process.env.LOCAL_IP || 'localhost';
+const port = process.env.PORT;
 
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
@@ -68,7 +73,7 @@ app.post('/start-session', (req, res) => {
     files: [],
   });
 
-  const wsUrl = `ws://192.168.0.105:5000`;
+  const wsUrl = `ws://${ip}:${port}`;
   const qrData = JSON.stringify({ wsUrl, sessionId });
 
   res.json({ sessionId, qrData });
@@ -225,6 +230,5 @@ wss.on('connection', (ws) => {
 
 const PORT = 5000;
 server.listen(PORT, () => {
-  const ip = "192.168.0.105";
   console.log(`Server running at http://${ip}:${PORT}`);
 });
